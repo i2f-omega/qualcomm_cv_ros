@@ -26,4 +26,7 @@ ROS package for computer vision demos, working towards Terrain Relative Navigati
 5. _____ is a ROS package built following these steps [here](https://docs.modalai.com/build-ros-nodes-for-voxl/)
    1. It is designed to be run on the Qualcomm itself. This involves developing on the host PC and using adb to push updates onto the Qualcomm as [here](https://docs.modalai.com/setup-adb/)
       1. `adb push <host/pc/package/path>/_______ ____/____/____`
-      2. TODO: Fill in blanks for package name and paths
+      2. Alternatively, you can git pull directly onto the Qualcomm
+         1. Make sure to pull using HTTPS or you'll get permission issues
+      3. TODO: Fill in blanks for package name and paths
+      4. 
