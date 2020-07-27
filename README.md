@@ -15,7 +15,7 @@ ROS package for computer vision demos, working towards Terrain Relative Navigati
       1. `$ adb shell`
       2. `# bash`
       3. `yocto:/# roscore`
-   2. Launch High resolution 
+   2. Launch High resolution camera
    3. `yocto:/# roslaunch voxl_cam_ros  hires.launch`
       1. Launches the greyscale highres camera stream
       2. For some reason, color highres won't display on RVIZ...
@@ -23,10 +23,13 @@ ROS package for computer vision demos, working towards Terrain Relative Navigati
       1. `$ rviz`
       2. Select `Add` button -> `/hires/image_raw/Image/raw`
 4. Install OpenCV for Qualcomm found on the VOXl GitLab [here](https://gitlab.com/voxl-public/voxl-opencv-3-4-6)
-5. _____ is a ROS package built following these steps [here](https://docs.modalai.com/build-ros-nodes-for-voxl/)
-   1. It is designed to be run on the Qualcomm itself. This involves developing on the host PC and using adb to push updates onto the Qualcomm as [here](https://docs.modalai.com/setup-adb/)
-      1. `adb push <host/pc/package/path>/_______ ____/____/____`
-      2. Alternatively, you can git pull directly onto the Qualcomm
+5. `qualcomm_cv_ros` is a ROS package built following these steps [here](https://docs.modalai.com/build-ros-nodes-for-voxl/)
+   1. Instead of cloning their package, clone ours with `git clone https://github.com/i2f-omega/qualcomm_cv_ros.git`
          1. Make sure to pull using HTTPS or you'll get permission issues
-      3. TODO: Fill in blanks for package name and paths
-      4. 
+   2. It is designed to be run on the Qualcomm itself. This involves developing on the host PC and using adb to push updates onto the Qualcomm as [here](https://docs.modalai.com/setup-adb/)
+      1. `adb push <host/pc/path>/catkin_ws/src/qualcomm_cv_ros/src/<file_name>.py /home/root/catkin_ws/src/qualcomm_cv_ros/src/`
+         1. Same procedure for `.launch` files
+      2. Alternatively, you can git pull directly onto the Qualcomm if repo is updated
+
+
+**Don't forget to `source catkin_ws/devel/setup.bash` if it isn't finding the launch files or executables you're trying to run**
