@@ -46,7 +46,11 @@ class ImageRotate():
 
     def img_callback(self, msg):
         try:
-            image = self.bridge.imgmsg_to_cv2(msg, desired_encoding="passthrough")
+            if msg.encoding == "mono8": # Greyscale highres stream from Qualcomm
+                image = self.bridge.imgmsg_to_cv2(msg, desired_encoding="passthrough")
+            else: # Color highres stream from Qualcomm
+                image = self.bridge.imgmsg_to_cv2(msg, desired_encoding="bgr8")
+
             if reduce_size:
                 image = cv2.resize(image, (0,0), fx = 0.5, fy = 0.5)
             if rotate_90:

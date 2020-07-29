@@ -5,8 +5,8 @@ using ORB feature detection
 
 Matches the features to a reference image
 
-Optionally: Performs histogram equalization
-prior to detecting features
+Optionally: Performs histogram equalization on
+greyscale images prior to detecting features
 """
 
 # Standard dependencies
@@ -23,7 +23,7 @@ import cv2
 # Choose one or neither
 # If both, it will use standard
 use_hist_equal = True
-num_matches = 20
+num_matches = 15
 
 class HistogramEqualization():
 
@@ -46,8 +46,8 @@ class HistogramEqualization():
 
         # Read the reference image, find the keypoints and compute the descriptors with ORB
         ref_color = cv2.imread('/home/kcoble/catkin_ws/src/qualcomm_cv_ros/include/loft_color.jpg')
-        ref_color = cv2.resize(ref_color, (1920, 1080))
-        self.ref_img = cv2.cvtColor(ref_color, cv2.COLOR_BGR2GRAY)
+        self.ref_img = cv2.resize(ref_color, (1920, 1080))
+        self.ref_grey = cv2.cvtColor(self.ref_img, cv2.COLOR_BGR2GRAY)
         self.ref_kp, self.ref_des = self.orb.detectAndCompute(self.ref_img, None)
 
         # Initialize subscriber to image stream
@@ -56,10 +56,13 @@ class HistogramEqualization():
 
     def img_callback(self, msg):
         try:
-            stream = self.bridge.imgmsg_to_cv2(msg, desired_encoding="passthrough")
 
-            if use_hist_equal:
-                stream = cv2.equalizeHist(stream)
+            if msg.encoding == "mono8": # Greyscale highres stream from Qualcomm
+                stream = self.bridge.imgmsg_to_cv2(msg, desired_encoding="passthrough")
+                if use_hist_equal: # Can only equalize a greyscale image
+                    stream = cv2.equalizeHist(stream)
+            else: # Color highres stream from Qualcomm
+                stream = self.bridge.imgmsg_to_cv2(msg, desired_encoding="bgr8")
 
             # find the keypoints and compute the descriptors with ORB
             kp, des = self.orb.detectAndCompute(stream, None)
@@ -69,8 +72,12 @@ class HistogramEqualization():
             # Sort them in the order of their distance.
             matches = sorted(matches, key = lambda x:x.distance)
 
-            # Draw first __ matches.
-            matched_img = cv2.drawMatches(self.ref_img,self.ref_kp,stream,kp,matches[:num_matches], outImg = None, flags=2)
+            if msg.encoding == "mono8": # Greyscale highres stream from Qualcomm
+                # Draw first __ matches.
+                matched_img = cv2.drawMatches(self.ref_grey,self.ref_kp,stream,kp,matches[:num_matches], outImg = None, flags=2)
+            else:
+                # Draw first __ matches.
+                matched_img = cv2.drawMatches(self.ref_img,self.ref_kp,stream,kp,matches[:num_matches], outImg = None, flags=2)
 
             self.pub.publish(self.bridge.cv2_to_imgmsg(matched_img, "passthrough"))
 

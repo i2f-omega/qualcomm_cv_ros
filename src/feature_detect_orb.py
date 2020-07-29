@@ -18,11 +18,10 @@ from sensor_msgs.msg import Image
 from cv_bridge import CvBridge, CvBridgeError
 import cv2
 
-# Choose one or neither
-# If both, it will use standard
+# Will only do histogram equalization on greyscale images
 use_hist_equal = True
 
-class HistogramEqualization():
+class FeatureDetection():
 
     def __init__(self):
 
@@ -45,10 +44,12 @@ class HistogramEqualization():
 
     def img_callback(self, msg):
         try:
-            image = self.bridge.imgmsg_to_cv2(msg, desired_encoding="passthrough")
-
-            if use_hist_equal:
-                image = cv2.equalizeHist(image)
+            if msg.encoding == "mono8": # Greyscale highres stream from Qualcomm
+                image = self.bridge.imgmsg_to_cv2(msg, desired_encoding="passthrough")
+                if use_hist_equal: # Can only equalize a greyscale image
+                    image = cv2.equalizeHist(image)
+            else: # Color highres stream from Qualcomm
+                image = self.bridge.imgmsg_to_cv2(msg, desired_encoding="bgr8")
 
             # find the keypoints and compute the descriptors with ORB
             kp, des = self.orb.detectAndCompute(image, None)
@@ -64,10 +65,10 @@ class HistogramEqualization():
 
 if __name__ == '__main__':
     # Initialize ROS node
-    rospy.init_node('image_stream_rotate', anonymous=True)
+    rospy.init_node('feature_detection', anonymous=True)
     rospy.loginfo("Successful initilization of node")
 
-    HE = HistogramEqualization()
+    FD = FeatureDetection()
 
     print("running...")
     # Run until KeyboardInterrupt
