@@ -64,5 +64,6 @@ catkin_make
 3. Launch file_cam node:
 ```bash
 # From qualcomm_cv_ros:
-roslaunch launch/file_cam.launch file:=$YOUR_VIDEO_FILE viz:=true start:=5300 stop:=7000 loop:=false
+roslaunch launch/file_cam.launch file:=$YOUR_VIDEO_FILE viz:=true start:=5300 stop:=7000 loop:=false width:=1280 height:=720
 ```
+Most arguments are optional. Additional arguments can be found in [video_stream_opencv/launch/camera.launch](https://github.com/ros-drivers/video_stream_opencv/blob/master/launch/camera.launch)
