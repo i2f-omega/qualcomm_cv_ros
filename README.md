@@ -64,6 +64,17 @@ catkin_make
 3. Launch file_cam node:
 ```bash
 # From qualcomm_cv_ros:
-roslaunch launch/file_cam.launch file:=$YOUR_VIDEO_FILE viz:=true start:=5300 stop:=7000 loop:=false width:=1280 height:=720
+roslaunch launch/file_cam.launch file:=$YOUR_VIDEO_FILE viz:=true start:=5300 stop:=7000
+
+# This is equivalent to:
+roslaunch ../video_stream_opencv/launch/camera.launch video_stream_provider:=$YOUR_VIDEO_FILE start_frame:=5300 stop_frame:=7000
 ```
 Most arguments are optional. Additional arguments can be found in [video_stream_opencv/launch/camera.launch](https://github.com/ros-drivers/video_stream_opencv/blob/master/launch/camera.launch)
+
+`file_cam.launch` changes some of the default arguments and shortens their names:
+
+- `loop_videofile` (false) -> `loop` (false)
+- `visualize` (true) -> `viz` (**false**)
+- `start_frame` (0) -> `start` (0)
+- `stop_frame` (-1) -> `stop` (-1)
+- `video_stream_provider` (0) -> `file` (`/media/sf_vm_ros/grail_20121205b_GRAILflyover20121205-1280.mp4`)
