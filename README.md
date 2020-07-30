@@ -67,7 +67,9 @@ catkin_make
 roslaunch launch/file_cam.launch file:=$YOUR_VIDEO_FILE viz:=true start:=5300 stop:=7000
 
 # This is equivalent to:
-roslaunch ../video_stream_opencv/launch/camera.launch video_stream_provider:=$YOUR_VIDEO_FILE start_frame:=5300 stop_frame:=7000
+roslaunch ../video_stream_opencv/launch/camera.launch \
+    video_stream_provider:=$YOUR_VIDEO_FILE \
+    start_frame:=5300 stop_frame:=7000
 ```
 Most arguments are optional. Additional arguments can be found in [video_stream_opencv/launch/camera.launch](https://github.com/ros-drivers/video_stream_opencv/blob/master/launch/camera.launch)
 
