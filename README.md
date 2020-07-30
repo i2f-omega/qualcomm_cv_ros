@@ -48,3 +48,21 @@ But for now, use these steps:
 3. Display stream on host PC with RVIZ
    1. `$ rviz`
    2. Select `Add` button and select `<repubbed/image/topic>`
+
+## File camera
+To stream video from a file, we use [video_stream_opencv](https://github.com/ros-drivers/video_stream_opencv).
+
+1. Build `video_stream_opencv`:
+```bash
+# From your catkin workspace:
+cd src
+git clone https://github.com/ros-drivers/video_stream_opencv.git
+cd ..
+catkin_make
+```
+2. Download flyby video (e.g. https://www.jpl.nasa.gov/video/details.php?id=1167).
+3. Launch file_cam node:
+```bash
+# From qualcomm_cv_ros:
+roslaunch launch/file_cam.launch file:=$YOUR_VIDEO_FILE viz:=true start:=5300 stop:=7000 loop:=false
+```

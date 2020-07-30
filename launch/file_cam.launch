@@ -1,0 +1,20 @@
+<launch>
+    <!-- disable visualization by default -->
+    <arg name="viz" default="false" />
+    <!-- start on first frame by default -->
+    <arg name="start" default="0" />
+    <!-- end on final frame by default -->
+    <arg name="stop" default="-1" />
+    <!-- don't loop by default -->
+    <arg name="loop" default="false" />
+    <!-- default video file path -->
+    <arg name="file" default="/media/sf_vm_ros/grail_20121205b_GRAILflyover20121205-1280.mp4" />
+    <include file="$(find video_stream_opencv)/launch/camera.launch">
+        <arg name="camera_name" value="webcam" />
+        <arg name="video_stream_provider" value="$(arg file)" />
+        <arg name="visualize" value="$(arg viz)" />
+        <arg name="start_frame" value="$(arg start)"/>
+        <arg name="stop_frame" value="$(arg stop)"/>
+        <arg name="loop_videofile" value="$(arg loop)"/>
+    </include>
+</launch>
