@@ -48,3 +48,36 @@ But for now, use these steps:
 3. Display stream on host PC with RVIZ
    1. `$ rviz`
    2. Select `Add` button and select `<repubbed/image/topic>`
+
+## File camera
+To stream video from a file, we use [video_stream_opencv](https://github.com/ros-drivers/video_stream_opencv).
+
+1. Build `video_stream_opencv`:
+```bash
+# From your catkin workspace:
+cd src
+git clone https://github.com/ros-drivers/video_stream_opencv.git
+cd ..
+catkin_make
+```
+2. Download flyby video (e.g. https://www.jpl.nasa.gov/video/details.php?id=1167).
+3. Launch file_cam node:
+```bash
+# From qualcomm_cv_ros:
+roslaunch launch/file_cam.launch file:=$YOUR_VIDEO_FILE viz:=true start:=5300 stop:=7000
+
+# This is equivalent to:
+roslaunch ../video_stream_opencv/launch/camera.launch \
+    video_stream_provider:=$YOUR_VIDEO_FILE \
+    start_frame:=5300 stop_frame:=7000
+```
+Most arguments are optional. Additional arguments can be found in [video_stream_opencv/launch/camera.launch](https://github.com/ros-drivers/video_stream_opencv/blob/master/launch/camera.launch)
+
+`file_cam.launch` changes some of the default arguments and shortens their names:
+
+- `camera_name` (camera) -> `name` (hires)
+- `loop_videofile` (false) -> `loop` (false)
+- `visualize` (true) -> `viz` (**false**)
+- `start_frame` (0) -> `start` (0)
+- `stop_frame` (-1) -> `stop` (-1)
+- `video_stream_provider` (0) -> `file` (`/media/sf_vm_ros/grail_20121205b_GRAILflyover20121205-1280.mp4`)
