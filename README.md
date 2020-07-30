@@ -75,6 +75,7 @@ Most arguments are optional. Additional arguments can be found in [video_stream_
 
 `file_cam.launch` changes some of the default arguments and shortens their names:
 
+- `camera_name` (camera) -> `name` (hires)
 - `loop_videofile` (false) -> `loop` (false)
 - `visualize` (true) -> `viz` (**false**)
 - `start_frame` (0) -> `start` (0)

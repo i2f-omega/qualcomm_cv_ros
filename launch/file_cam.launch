@@ -1,4 +1,6 @@
 <launch>
+    <!-- camera name -->
+    <arg name="name" default="hires" />
     <!-- disable visualization by default -->
     <arg name="viz" default="false" />
     <!-- start on first frame by default -->
@@ -10,6 +12,7 @@
     <!-- default video file path -->
     <arg name="file" default="/media/sf_vm_ros/grail_20121205b_GRAILflyover20121205-1280.mp4" />
     <include file="$(find video_stream_opencv)/launch/camera.launch">
+        <arg name="camera_name" value="$(arg name)" />
         <arg name="video_stream_provider" value="$(arg file)" />
         <arg name="visualize" value="$(arg viz)" />
         <arg name="start_frame" value="$(arg start)" />
