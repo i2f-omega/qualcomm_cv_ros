@@ -56,9 +56,9 @@ class FeatureMatching():
         # create BFMatcher object
 
         # Read the reference image, find the keypoints and compute the descriptors with ORB
-        ref_color = cv2.imread(image_path)
-        # self.ref_img = cv2.resize(ref_color, (1920,1080))
-        self.ref_img = cv2.resize(ref_color, (0,0), fx = 1.0, fy = 1.0)
+        self.ref_img = cv2.imread(image_path)
+        # self.ref_img = cv2.resize(self.ref_img, (1920,1080))
+        # self.ref_img = cv2.resize(self.ref_img, (0,0), fx = 1.0, fy = 1.0)
         self.ref_grey = cv2.cvtColor(self.ref_img, cv2.COLOR_BGR2GRAY)
         self.ref_kp, self.ref_des = self.matcher.detectAndCompute(self.ref_img, None)
 
@@ -107,15 +107,13 @@ class FeatureMatching():
                 dst_pts = np.float32([kp[m.trainIdx].pt for m in good]).reshape(-1,1,2)
 
                 M, mask = cv2.findHomography(src_pts, dst_pts, cv2.RANSAC, 5.0)
-                print("M", M)
+                # print("M", M)
 
                 # matchesMask = mask.ravel().tolist()
                 h, w, d = self.ref_img.shape
-                print("h", h)
-                print("w", w)
                 pts = np.float32([ [0,0],[0,h-1],[w-1,h-1],[w-1,0] ]).reshape(-1,1,2)
                 dst = cv2.perspectiveTransform(pts,M)
-                print(dst)
+                # print(dst)
 
                 trans_img = cv2.polylines(stream,[np.int32(dst)],True,255,3, cv2.LINE_AA)
                 self.pub_trans.publish(self.bridge.cv2_to_imgmsg(trans_img, "passthrough"))
