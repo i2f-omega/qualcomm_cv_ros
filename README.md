@@ -16,7 +16,7 @@ ROS package for computer vision demos, working towards Terrain Relative Navigati
       2. `# bash`
       3. `yocto:/# roslaunch voxl_cam_ros  hires.launch`
          1. Launches the greyscale highres camera stream
-         2. For some reason, color highres won't display on RVIZ...
+         2. Alternatively: `yocto:/# roslaunch voxl_cam_ros  hires_color.launch`
    2. Diplay stream on host PC with RVIZ
       1. `$ rviz`
       2. Select `Add` button and select `/hires/image_raw/Image/raw`

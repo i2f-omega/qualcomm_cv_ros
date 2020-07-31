@@ -26,7 +26,7 @@ class FeatureDetection():
     def __init__(self):
 
         sub_img_topic = "/hires/image_raw"
-        pub_img_topic = "/hires/features_ORB"
+        pub_img_topic = "/hires/features_SIFT"
 
         # Initialize CV bridge
         self.bridge = CvBridge()
@@ -34,8 +34,8 @@ class FeatureDetection():
         # Initialize publisher
         self.pub = rospy.Publisher(pub_img_topic, Image, queue_size=10)
 
-        # Initiate ORB detector
-        self.orb = cv2.ORB_create()
+        # Initiate SIFT detector
+        self.sift = cv2.xfeatures2d.SIFT_create()
 
         # Initialize subscriber to image stream
         rospy.Subscriber(sub_img_topic, Image, self.img_callback)
@@ -43,6 +43,7 @@ class FeatureDetection():
 
 
     def img_callback(self, msg):
+        print("callback")
         try:
             if msg.encoding == "mono8": # Greyscale highres stream from Qualcomm
                 image = self.bridge.imgmsg_to_cv2(msg, desired_encoding="passthrough")
@@ -52,7 +53,7 @@ class FeatureDetection():
                 image = self.bridge.imgmsg_to_cv2(msg, desired_encoding="bgr8")
 
             # find the keypoints and compute the descriptors with ORB
-            kp, des = self.orb.detectAndCompute(image, None)
+            kp, des = self.sift.detectAndCompute(image, None)
 
             # draw only keypoints location,not size and orientation
             image = cv2.drawKeypoints(image,kp,outImage = None,color=(0,255,0), flags=0)
