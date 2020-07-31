@@ -49,6 +49,16 @@ But for now, use these steps:
    1. `$ rviz`
    2. Select `Add` button and select `<repubbed/image/topic>`
 
+### Feature Matching Notes
+1. There are two feature detection algorithms implemented. ORB is worse, faster, and can run on the Qualcomm, SIFT is better, slower, and can only (as of now) run on the host PC.
+   1. ORB - Fast (~40x SIFT), Open Source, Not scale or rotationally invariant
+   2. SIFT - Slow, Patented, scale and rotationally invariant
+2. SIFT requires `opencv_contrib` which is not installed on the ModalAI Qualcomm Flight Pro boards
+   1. You must use ORB if you are performing the feature matching on the Qualcomm
+   2. You may use SIFT if you subscribe to the image from the Qualcomm and perform matching on the host PC.
+   3. Install on host PC with: `pip install opencv-contrib-python==<OpenCV_version_number>`
+3. SURF would be a decent middle ground to implement (between ORB & SIFT), but would have the same issues as SIFT of only running on the host PC.
+
 ## File camera
 To stream video from a file, we use [video_stream_opencv](https://github.com/ros-drivers/video_stream_opencv).
 
