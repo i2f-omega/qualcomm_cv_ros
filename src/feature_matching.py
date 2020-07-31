@@ -25,7 +25,7 @@ use_hist_equal = True
 min_good_matches = 5
 ORB_match_cutoff = 35.0
 SIFT_match_cutoff = 200.0
-match_alg = "SIFT" # "SIFT" or "ORB"
+match_alg = "ORB" # "SIFT" or "ORB"
 class FeatureMatching():
 
     def __init__(self):
