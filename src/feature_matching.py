@@ -33,7 +33,8 @@ class FeatureMatching():
         sub_img_topic = "/hires/image_raw"
         pub_matches_topic = "/hires/feature_matches"
         pub_trans_topic = "/hires/feature_transform"
-        image_path = "/home/kcoble/catkin_ws/src/qualcomm_cv_ros/include/pictures/loft_lamp_grey.png"
+        image_path = "/home/root/catkin_ws/src/qualcomm_cv_ros/include/pictures/loft_basket_qualcomm.png"
+        # image_path = "/home/kcoble/catkin_ws/src/qualcomm_cv_ros/include/pictures/loft_basket_qualcomm.png"
 
         # Initialize CV bridge
         self.bridge = CvBridge()
