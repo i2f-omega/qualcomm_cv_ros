@@ -1,0 +1,37 @@
+# id's, locations, and orientations of markers
+
+# Format:
+#   Marker_id:
+#   - id (as int)
+#   - length (incl. black boundary, as float in [m])
+#   - [x, y, z] (as floats, in [m])
+#     - center of marker, distance from origin at ground level
+#   - [rot_x, rot_y, rot_z] (as floats, in [rad], about given axis)
+#     - Note that the donkeycar map still requires:
+#       -  [rot_x, rot_y, rot_z] = [0.0, 0.0, rot_z]
+#       - But qualcomm runs ROS and can handle 6 DOF marker poses
+#     - [0.0, 0.0, 0.0] matches with origin frame
+#     - increase rot_x by rotating ccw (onto side) facing origin
+#     - increase rot_y by putting marker face down when facing origin
+#     - increase rot_z by rotating ccw looking down at marker
+
+Marker_0:
+- 0
+- 0.16
+- [1.2, 0.7, 0.18]
+- [0.0, 0.0, -1.57]
+Marker_1:
+- 1
+- 0.16
+- [2.54, -0.15, 0.25]
+- [0.0, 0.0, 3.14]
+Marker_2:
+- 2
+- 0.16
+- [0.0, 0.0, 0.18]
+- [0.0, 0.0, 0.0]
+Marker_3:
+- 3
+- 0.16
+- [0.85, -0.60, 0.18]
+- [0.0, 0.0, 1.57]

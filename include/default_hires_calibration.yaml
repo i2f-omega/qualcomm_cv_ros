@@ -1,0 +1,19 @@
+# Default calibration values for the hires camera
+# These should be replaced with calibration values
+# from our actual cameras
+camera_matrix:
+- - 275.630720
+  - 0.000000
+  - 307.269697
+- - 0.000000
+  - 274.937742
+  - 253.093799
+- - 0.000000
+  - 0.000000
+  - 1.000000
+dist_coeff:
+- - -0.214715
+  - 0.046403
+  - 0.000623
+  - 0.000610
+  - -0.004311
