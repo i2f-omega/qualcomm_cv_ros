@@ -43,7 +43,7 @@ class ArucoLocalization():
         self.bridge = CvBridge()
 
         # Initialize publisher
-        self.pub = rospy.Publisher(pub_pose_topic, PoseStamped, queue_size=10)
+        self.pose_pub = rospy.Publisher(pub_pose_topic, PoseStamped, queue_size=10)
         self.im_pub = rospy.Publisher(aruco_image_topic, Image, queue_size=1)
 
         # Initialize aruco details
@@ -51,6 +51,11 @@ class ArucoLocalization():
         self.marker_set, self.marker_dict = self.load_markers(marker_map_path)
         self.dictionary = cv2.aruco.Dictionary_get(aruco_dictionary)
         self.parameters = cv2.aruco.DetectorParameters_create()
+
+        # Initialize transform from camera to qualcomm
+        tmat = translation_matrix((0.1, 0, 0.2))
+        qmat = quaternion_matrix(quaternion_from_euler(-1.57, 0, -1.57))
+        self.tf_cam2baselink = inverse_matrix(np.dot(tmat, qmat))
 
         # Initialize subscriber to image stream
         rospy.Subscriber(sub_img_topic, Image, self.img_callback)#, queue_size = 1)
@@ -64,31 +69,22 @@ class ArucoLocalization():
             image = cv2.resize(image, (640,480)) # Temporary until camera is calibrated properly
 
             ids, corners = self.detectMarkersInMap(image)
-            cam_pose, image = self.updatePoseFromMarkers(ids, corners, image)
+            pose, image = self.updatePoseFromMarkers(ids, corners, image)
             self.im_pub.publish(self.bridge.cv2_to_imgmsg(image, "passthrough"))
 
-            if cam_pose:
-                temp_pub = PoseStamped()
-                # temp_pub.pose = self.marker_dict["0"].pose
-                temp_pub.pose = cam_pose
-                temp_pub.header.frame_id = "map"
-                temp_pub.header.stamp = rospy.Time.now()
-
-                self.pub.publish(temp_pub)
+            if pose:
+                qualcomm_pose = PoseStamped()
+                qualcomm_pose.pose = pose
+                qualcomm_pose.header.frame_id = "map"
+                qualcomm_pose.header.stamp = rospy.Time.now()
+                self.pose_pub.publish(qualcomm_pose)
 
         except CvBridgeError as e:
             print(e)
 
 
     def updatePoseFromMarkers(self, ids, corners, image):
-        """
-        NOTE:
-        For now I am ignoring 6 DOF pose and am
-        only looking at rotation about the z-axis
-        This assumes markers are all vertically
-        upright and that we only need x, y, and yaw
-        pose of the rover
-        """
+
         if ids:
             xs, ys, yaws = [], [], []
             for i, idx in enumerate(ids):
@@ -111,18 +107,25 @@ class ArucoLocalization():
                 # trans = translation_from_matrix(tf_map2cam)
                 rot = euler_from_quaternion(quaternion_from_matrix(tf_map2cam))
 
-                cam_pose = Pose()
-                cam_pose.position = Vector3(*translation_from_matrix(tf_map2cam))
-                cam_pose.orientation = Quaternion(*quaternion_from_matrix(tf_map2cam))
+                tf_map2baselink = np.dot(tf_map2cam, self.tf_cam2baselink)
+
+                baselink_pose = Pose()
+                baselink_pose.position = Vector3(*translation_from_matrix(tf_map2baselink))
+                baselink_pose.orientation = Quaternion(*quaternion_from_matrix(tf_map2baselink))
 
                 print(marker.id)
-                print("cam pose", cam_pose)
+                print("cam pose", baselink_pose)
 
                 # Draw axis on marker and publish image
                 image = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
                 image = cv2.aruco.drawAxis(image, self.cam_mtx, self.distort_mtx, rvec, tvec, 0.1)
 
-            return cam_pose, image
+            """
+            NOTE
+            Still need to take average of poses when multiple markers are detected
+            """
+
+            return baselink_pose, image
         else:
             return None, image
 
