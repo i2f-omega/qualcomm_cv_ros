@@ -68,7 +68,7 @@ class FeatureDetection():
 if __name__ == '__main__':
     # Initialize ROS node
     rospy.init_node('SIFT_feature_detection', anonymous=True)
-    rospy.loginfo("Successful initilization of node")
+    rospy.loginfo("Successful initialization of node")
 
     FD = FeatureDetection()
 

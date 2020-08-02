@@ -59,7 +59,7 @@ class ColorStream():
 if __name__ == '__main__':
     # Initialize ROS node
     rospy.init_node('color_image_stream', anonymous=True)
-    rospy.loginfo("Successful initilization of node")
+    rospy.loginfo("Successful initialization of node")
 
     CS = ColorStream()
 

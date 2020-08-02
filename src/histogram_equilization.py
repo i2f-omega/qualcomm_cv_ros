@@ -61,7 +61,7 @@ class HistogramEqualization():
 if __name__ == '__main__':
     # Initialize ROS node
     rospy.init_node('image_stream_rotate', anonymous=True)
-    rospy.loginfo("Successful initilization of node")
+    rospy.loginfo("Successful initialization of node")
 
     HE = HistogramEqualization()
 
