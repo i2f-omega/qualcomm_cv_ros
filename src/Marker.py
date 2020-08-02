@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import math
 import numpy as np
 from geometry_msgs.msg import Pose, Quaternion
 from tf.transformations import quaternion_from_euler
@@ -24,7 +25,11 @@ class Marker():
         self.pose.position.x = x
         self.pose.position.y = y
         self.pose.position.z = z
-        self.pose.orientation = Quaternion(*quaternion_from_euler(rot_x, rot_y, rot_z))
+        rot_x += math.pi/2
+        rot_y += 0
+        rot_z += math.pi/2
+
+        self.pose.orientation = Quaternion(*quaternion_from_euler(rot_x, rot_y+math.pi/2, rot_z))
         tmat = translation_matrix((x, y, z))
         qmat = quaternion_matrix(quaternion_from_euler(rot_x, rot_y, rot_z))
         self.tf_mat = np.dot(tmat, qmat)
