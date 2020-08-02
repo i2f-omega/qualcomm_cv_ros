@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<launch>
+
+    <!-- Feature detection algorithm to use -->
+    <arg name="detection_algorithm" default="ORB" /> <!-- "ORB" or "SIFT" -->
+
+    <!-- Image name - saved in qualcomm_cv_ros/include/pictures/ -->
+    <arg name="image_name" default="lunar_crater.jpg" />
+    <!-- Amount to resize image -->
+    <arg name="image_rescale" default="1.0" />
+
+    <!-- Boolean - use histogram equalization on greyscale image stream -->
+    <arg name="use_hist_equal" default="True" />
+
+    <!-- Matching parameters -->
+    <!-- Minimum number of matches to attempt finding homography-->
+    <arg name="minimum_good_matches" default="5" />
+    <!-- Max ORB match distance value to be considered a "good match" -->
+    <arg name="ORB_match_cutoff" default="40.0" />
+    <!-- Max SIFT match distance value to be considered a "good match" -->
+    <arg name="SIFT_match_cutoff" default="200.0" />
+
+
+    <!-- Image stream subscribed to -->
+    <arg name="subscribed_image_topic" default="/hires/image_raw" />
+    <!-- Published stream of matched features -->
+    <arg name="matches_image_topic" default="/features/matched" />
+    <!-- Published stream of detected object in a bounding box -->
+    <arg name="boxed_image_topic" default="/features/object" />
+
+
+    <node pkg="qualcomm_cv_ros" type="feature_matching.py" name="feature_matching" output="screen">
+
+        <param name="detection_algorithm"                   value="$(arg detection_algorithm )" />
+        <param name="image_path"                            value="$(find qualcomm_cv_ros)/include/pictures/$(arg image_name)" />
+        <param name="image_rescale"         type="double"   value="$(arg image_rescale)" />
+        <param name="use_hist_equal"        type="bool"     value="$(arg use_hist_equal)" />
+
+        <param name="minimum_good_matches"  type="int"      value="$(arg minimum_good_matches)" />
+        <param name="ORB_match_cutoff"      type="double"   value="$(arg ORB_match_cutoff)" />
+        <param name="SIFT_match_cutoff"     type="double"   value="$(arg SIFT_match_cutoff)" />
+
+        <param name="subscribed_image_topic"                value="$(arg subscribed_image_topic)" />
+        <param name="matches_image_topic"                   value="$(arg matches_image_topic)" />
+        <param name="boxed_image_topic"                     value="$(arg boxed_image_topic )" />
+
+    </node>
+
+</launch>

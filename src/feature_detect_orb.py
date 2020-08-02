@@ -24,9 +24,11 @@ use_hist_equal = True
 class FeatureDetection():
 
     def __init__(self):
-
-        sub_img_topic = "/hires/image_raw"
-        pub_img_topic = "/hires/features_ORB"
+        # Load params from launch file
+        param = rospy.search_param("subscribed_image_topic")
+        sub_img_topic = rospy.get_param(param)
+        param = rospy.search_param("features_image_topic")
+        pub_img_topic = rospy.get_param(param)
 
         # Initialize CV bridge
         self.bridge = CvBridge()
@@ -65,7 +67,7 @@ class FeatureDetection():
 
 if __name__ == '__main__':
     # Initialize ROS node
-    rospy.init_node('feature_detection', anonymous=True)
+    rospy.init_node('ORB_feature_detection', anonymous=True)
     rospy.loginfo("Successful initilization of node")
 
     FD = FeatureDetection()

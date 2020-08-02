@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<launch>
+
+    <arg name="subscribed_image_topic" default="/hires/image_raw" />
+    <arg name="features_image_topic" default="/features/ORB" />
+
+
+    <node pkg="qualcomm_cv_ros" type="feature_detect_orb.py" name="ORB_feature_detection" output="screen">
+
+        <param name="subscribed_image_topic"    value="$(arg subscribed_image_topic)" />
+        <param name="features_image_topic"      value="$(arg features_image_topic)" />
+
+    </node>
+
+</launch>

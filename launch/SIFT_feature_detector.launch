@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<launch>
+
+    <arg name="subscribed_image_topic" default="/hires/image_raw" />
+    <arg name="features_image_topic" default="/features/SIFT" />
+
+
+    <node pkg="qualcomm_cv_ros" type="feature_detect_sift.py" name="SIFT_feature_detection" output="screen">
+
+        <param name="subscribed_image_topic"    value="$(arg subscribed_image_topic)" />
+        <param name="features_image_topic"      value="$(arg features_image_topic)" />
+
+    </node>
+
+</launch>

@@ -20,48 +20,58 @@ from sensor_msgs.msg import Image
 from cv_bridge import CvBridge, CvBridgeError
 import cv2
 
-# Will only do histogram equalization on greyscale images
-use_hist_equal = True
-min_good_matches = 5
-ORB_match_cutoff = 35.0
-SIFT_match_cutoff = 200.0
-match_alg = "ORB" # "SIFT" or "ORB"
 class FeatureMatching():
 
     def __init__(self):
+        # Load params from launch file
+        param = rospy.search_param("subscribed_image_topic")
+        sub_img_topic = rospy.get_param(param)
+        param = rospy.search_param("matches_image_topic")
+        pub_matches_topic = rospy.get_param(param)
+        param = rospy.search_param("boxed_image_topic")
+        pub_bound_box_topic = rospy.get_param(param)
 
-        sub_img_topic = "/hires/image_raw"
-        pub_matches_topic = "/hires/feature_matches"
-        pub_trans_topic = "/hires/feature_transform"
-        image_path = "/home/root/catkin_ws/src/qualcomm_cv_ros/include/pictures/loft_basket_qualcomm.png"
-        # image_path = "/home/kcoble/catkin_ws/src/qualcomm_cv_ros/include/pictures/loft_basket_qualcomm.png"
+        param = rospy.search_param("detection_algorithm")
+        self.detect_alg = rospy.get_param(param)
+        param = rospy.search_param("use_hist_equal")
+        self.use_hist_equal = rospy.get_param(param)
+
+        param = rospy.search_param("minimum_good_matches")
+        self.min_good_matches = rospy.get_param(param)
+        param = rospy.search_param("ORB_match_cutoff")
+        self.ORB_match_cutoff = rospy.get_param(param)
+        param = rospy.search_param("SIFT_match_cutoff")
+        self.SIFT_match_cutoff = rospy.get_param(param)
+
+        param = rospy.search_param("image_path")
+        image_path = rospy.get_param(param)
+        param = rospy.search_param("image_rescale")
+        image_rescale = rospy.get_param(param)
 
         # Initialize CV bridge
         self.bridge = CvBridge()
 
         # Initialize publishers
         self.pub_matches = rospy.Publisher(pub_matches_topic, Image, queue_size=10)
-        self.pub_trans = rospy.Publisher(pub_trans_topic, Image, queue_size=10)
+        self.pub_bound_box = rospy.Publisher(pub_bound_box_topic, Image, queue_size=10)
 
-        if match_alg == "ORB": # Initiate ORB detector & BFMatcher object
-            self.matcher = cv2.ORB_create(nfeatures=1500)
+        if self.detect_alg == "ORB": # Initiate ORB detector & BFMatcher object
+            self.detector = cv2.ORB_create(nfeatures=1500)
             self.bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
-
-        elif match_alg == "SIFT": # Initiate SIFT detector & BFMatcher object
-            self.matcher = cv2.xfeatures2d.SIFT_create()
+        elif self.detect_alg == "SIFT": # Initiate SIFT detector & BFMatcher object
+            self.detector = cv2.xfeatures2d.SIFT_create()
             self.bf = cv2.BFMatcher(cv2.NORM_L2, crossCheck=True)
-
         else:
             print("INVALID FEATURE MATCHING ALGORITHM")
 
-        # create BFMatcher object
+        if self.use_hist_equal: # Initialize adaptive histogram equalization
+            self.clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(24,24))
 
         # Read the reference image, find the keypoints and compute the descriptors with ORB
         self.ref_img = cv2.imread(image_path)
-        # self.ref_img = cv2.resize(self.ref_img, (1920,1080))
-        # self.ref_img = cv2.resize(self.ref_img, (0,0), fx = 1.0, fy = 1.0)
+        self.ref_img = cv2.resize(self.ref_img, (0,0), fx = image_rescale, fy = image_rescale)
         self.ref_grey = cv2.cvtColor(self.ref_img, cv2.COLOR_BGR2GRAY)
-        self.ref_kp, self.ref_des = self.matcher.detectAndCompute(self.ref_img, None)
+        self.ref_kp, self.ref_des = self.detector.detectAndCompute(self.ref_img, None)
 
         # Initialize subscriber to image stream
         rospy.Subscriber(sub_img_topic, Image, self.img_callback)
@@ -71,63 +81,58 @@ class FeatureMatching():
         try:
             if msg.encoding == "mono8": # Greyscale highres stream from Qualcomm
                 stream = self.bridge.imgmsg_to_cv2(msg, desired_encoding="passthrough")
-                if use_hist_equal: # Can only equalize a greyscale image
+                if self.use_hist_equal: # Can only equalize a greyscale image
                     # stream = cv2.equalizeHist(stream)
-                    clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(24,24))
-                    stream = clahe.apply(stream)
+                    stream = self.clahe.apply(stream)
             else: # Color highres stream from Qualcomm
                 stream = self.bridge.imgmsg_to_cv2(msg, desired_encoding="bgr8")
 
             # find the keypoints and compute the descriptors
-            kp, des = self.matcher.detectAndCompute(stream, None)
+            kp, des = self.detector.detectAndCompute(stream, None)
 
             # Match descriptors.
             matches = self.bf.match(self.ref_des, des)
             # # Sort them in the order of their distance.
-            matches = sorted(matches, key = lambda x:x.distance)
+            # matches = sorted(matches, key = lambda x:x.distance)
 
             good = []
-            if match_alg == "ORB": # Initiate ORB detector & BFMatcher object
+            if self.detect_alg == "ORB": # Initiate ORB detector & BFMatcher object
                 for m in matches:
-                    if m.distance < ORB_match_cutoff:
+                    if m.distance < self.ORB_match_cutoff:
                         good.append(m)
                     # else: # Only use if sorted
                     #     break
-            elif match_alg == "SIFT": # Initiate SIFT detector & BFMatcher object
+            elif self.detect_alg == "SIFT": # Initiate SIFT detector & BFMatcher object
                 for m in matches:
-                    if m.distance < SIFT_match_cutoff:
+                    if m.distance < self.SIFT_match_cutoff:
                         good.append(m)
                     # else: # Only use if sorted
                     #     break
             print("good matches:", len(good))
             # good = matches[:30]
 
-            if len(good) >= min_good_matches:
+            if len(good) >= self.min_good_matches:
 
                 src_pts = np.float32([self.ref_kp[m.queryIdx].pt for m in good]).reshape(-1,1,2)
                 dst_pts = np.float32([kp[m.trainIdx].pt for m in good]).reshape(-1,1,2)
 
                 M, mask = cv2.findHomography(src_pts, dst_pts, cv2.RANSAC, 5.0)
-                # print("M", M)
 
                 # matchesMask = mask.ravel().tolist()
                 h, w, d = self.ref_img.shape
                 pts = np.float32([ [0,0],[0,h-1],[w-1,h-1],[w-1,0] ]).reshape(-1,1,2)
                 dst = cv2.perspectiveTransform(pts,M)
-                # print(dst)
 
-                trans_img = cv2.polylines(stream,[np.int32(dst)],True,255,3, cv2.LINE_AA)
-                self.pub_trans.publish(self.bridge.cv2_to_imgmsg(trans_img, "passthrough"))
+                bound_box_img = cv2.polylines(stream,[np.int32(dst)],True,255,3, cv2.LINE_AA)
+                self.pub_bound_box.publish(self.bridge.cv2_to_imgmsg(bound_box_img, "passthrough"))
             else:
                 print("Not enough good matches")
-                print(len(good), " / ", min_good_matches)
+                print(len(good), " / ", self.min_good_matches)
 
-            # Publish matches no matter what
+            # Draw and publish "good" matches
             if msg.encoding == "mono8": # Greyscale highres stream from Qualcomm
-                # Draw first __ matches.
                 matched_img = cv2.drawMatches(self.ref_grey,self.ref_kp,stream,kp,good, outImg = None, flags=2)
             else:
-                # Draw first __ matches.
                 matched_img = cv2.drawMatches(self.ref_img,self.ref_kp,stream,kp,good, outImg = None, flags=2)
 
             self.pub_matches.publish(self.bridge.cv2_to_imgmsg(matched_img, "passthrough"))
