@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<launch>
+
+
+    <!-- .yaml filepaths - saved in qualcomm_cv_ros/include/ -->
+    <arg name="camera_calibration_filename"     default="default_hires_calibration.yaml" />
+    <arg name="marker_map_filename"             default="marker_map_loft.yaml" />
+
+    <!-- number of squares per side (e.g "4x4", "5x5", or "6x6") -->
+    <arg name="aruco_dictionary"                default="4x4" />
+
+    <!-- Image stream subscribed to -->
+    <arg name="subscribed_image_topic"          default="/hires/image_raw" />
+    <!-- Published stream with aruco axis -->
+    <arg name="aruco_image_topic"               default="/detected_markers" />
+    <!-- Published pose of qualcomm board -->
+    <arg name="qualcomm_pose_topic"             default="/qualcomm/pose" />
+
+
+    <node pkg="qualcomm_cv_ros" type="aruco_localization.py" name="aruco_localization" output="screen">
+
+        <param name="cam_calib_path"            value="$(find qualcomm_cv_ros)/include/$(arg camera_calibration_filename)" />
+        <param name="marker_map_path"           value="$(find qualcomm_cv_ros)/include/$(arg marker_map_filename)" />
+
+        <param name="aruco_dictionary"          value="$(arg aruco_dictionary)" />
+
+        <param name="subscribed_image_topic"    value="$(arg subscribed_image_topic)" />
+        <param name="aruco_image_topic"         value="$(arg aruco_image_topic)" />
+        <param name="qualcomm_pose_topic"       value="$(arg qualcomm_pose_topic )" />
+
+    </node>
+
+</launch>

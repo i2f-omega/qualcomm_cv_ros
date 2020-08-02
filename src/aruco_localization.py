@@ -30,20 +30,35 @@ from tf.transformations import quaternion_matrix, quaternion_from_matrix
 class ArucoLocalization():
 
     def __init__(self):
+        # Load params from launch file
+        param = rospy.search_param("subscribed_image_topic")
+        sub_img_topic = rospy.get_param(param)
+        param = rospy.search_param("aruco_image_topic")
+        aruco_image_topic = rospy.get_param(param)
+        param = rospy.search_param("qualcomm_pose_topic")
+        qualcomm_pose_topic = rospy.get_param(param)
 
-        sub_img_topic = "/hires/image_raw"
-        aruco_image_topic = "/detected_markers"
-        pub_pose_topic = "/qualcomm/pose"
+        param = rospy.search_param("cam_calib_path")
+        cam_calibration_path = rospy.get_param(param)
+        param = rospy.search_param("marker_map_path")
+        marker_map_path = rospy.get_param(param)
 
-        cam_calibration_path = "/home/kcoble/catkin_ws/src/qualcomm_cv_ros/include/default_hires_calibration.yaml"
-        marker_map_path = "/home/kcoble/catkin_ws/src/qualcomm_cv_ros/include/marker_map_loft.yaml"
-        aruco_dictionary = cv2.aruco.DICT_4X4_250
-
+        param = rospy.search_param("aruco_dictionary")
+        aruco_dict = rospy.get_param(param)
+        if aruco_dict == "4x4" or aruco_dict == "4X4" or str(aruco_dict) == "4":
+            aruco_dictionary = cv2.aruco.DICT_4X4_250
+        elif aruco_dict == "5x5" or aruco_dict == "5X5" or str(aruco_dict) == "5":
+            aruco_dictionary = cv2.aruco.DICT_5X5_250
+        elif aruco_dict == "6x6" or aruco_dict == "6X6" or str(aruco_dict) == "6":
+            aruco_dictionary = cv2.aruco.DICT_6X6_250
+        else:
+            print("Invalid (or not included) aruco marker dictionary")
+        print(aruco_dictionary)
         # Initialize CV bridge
         self.bridge = CvBridge()
 
         # Initialize publisher
-        self.pose_pub = rospy.Publisher(pub_pose_topic, PoseStamped, queue_size=10)
+        self.pose_pub = rospy.Publisher(qualcomm_pose_topic, PoseStamped, queue_size=10)
         self.im_pub = rospy.Publisher(aruco_image_topic, Image, queue_size=1)
 
         # Initialize aruco details
@@ -113,7 +128,7 @@ class ArucoLocalization():
                 baselink_pose.position = Vector3(*translation_from_matrix(tf_map2baselink))
                 baselink_pose.orientation = Quaternion(*quaternion_from_matrix(tf_map2baselink))
 
-                print(marker.id)
+                print("detected marker", marker.id)
                 print("cam pose", baselink_pose)
 
                 # Draw axis on marker and publish image
