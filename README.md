@@ -91,3 +91,11 @@ Most arguments are optional. Additional arguments can be found in [video_stream_
 - `start_frame` (0) -> `start` (0)
 - `stop_frame` (-1) -> `stop` (-1)
 - `video_stream_provider` (0) -> `file` (`/media/sf_vm_ros/grail_20121205b_GRAILflyover20121205-1280.mp4`)
+
+
+### If you have install issues:
+   For some reason I couldn't build with the instructions above, so install/usage as follows is a possible workaround:
+   * Delete `build/` and `devel/` directories in your catkin_ws
+   * Delete the `video_stream_opencv` package in `catkin_ws/src/`
+   * Install with: `sudo apt-get install ros-YOURVERSION-video-stream-opencv`
+   * After a `catkin_make` and a `source ~/catkin_ws/devel/setup.bash` (if not included in `.bashrc`), a video file can be streamed with: `roslaunch video_stream_opencv camera.launch video_stream_provider:="<path/to/video.filetype>" camera_name:=hires visualize:=true`
